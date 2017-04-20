@@ -98,7 +98,6 @@ class InterceptionGenerator implements GeneratorInterface
              '$ref = new \ReflectionMethod(%s, %s);'."\n"
             .'$interceptors = $this->'.$this->prefix.'loader->loadInterceptors($ref, $this, array(%s));'."\n"
             .'$invocation = new \CG\Proxy\MethodInvocation($ref, $this, array(%s), $interceptors);'."\n\n"
-            .'return $invocation->proceed();'
         ;
 
         foreach ($methods as $method) {
@@ -108,7 +107,13 @@ class InterceptionGenerator implements GeneratorInterface
             }
             $params = implode(', ', $params);
 
-            $genMethod = PhpMethod::fromReflection($method)
+            $genMethod = PhpMethod::fromReflection($method);
+                if ($genMethod->getReturnType() === 'void') {
+                    $interceptorCode .= '$invocation->proceed();';
+                } else {
+                    $interceptorCode .= 'return $invocation->proceed();';
+                }
+            $genMethod
                 ->setBody(sprintf($interceptorCode, var_export(ClassUtils::getUserClass($method->class), true), var_export($method->name, true), $params, $params))
                 ->setDocblock(null)
             ;
