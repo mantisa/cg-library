@@ -108,13 +108,15 @@ class InterceptionGenerator implements GeneratorInterface
             $params = implode(', ', $params);
 
             $genMethod = PhpMethod::fromReflection($method);
-                if ($genMethod->getReturnType() === 'void') {
-                    $interceptorCode .= '$invocation->proceed();';
-                } else {
-                    $interceptorCode .= 'return $invocation->proceed();';
-                }
+
+            if ($genMethod->getReturnType() === 'void') {
+                $methodBody = $interceptorCode . '$invocation->proceed();';
+            } else {
+                $methodBody = $interceptorCode . 'return $invocation->proceed();';
+            }
+
             $genMethod
-                ->setBody(sprintf($interceptorCode, var_export(ClassUtils::getUserClass($method->class), true), var_export($method->name, true), $params, $params))
+                ->setBody(sprintf($methodBody, var_export(ClassUtils::getUserClass($method->class), true), var_export($method->name, true), $params, $params))
                 ->setDocblock(null)
             ;
             $genClass->setMethod($genMethod);
