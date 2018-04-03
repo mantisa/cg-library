@@ -189,6 +189,11 @@ class DefaultVisitor implements DefaultVisitorInterface
         if ($method->hasReturnType()) {
             $type = $method->getReturnType();
             $this->writer->write(': ');
+
+            if ($method->isNullableTypeReturned()) {
+                $this->writer->write('?');
+            }
+
             if (!$method->hasBuiltInReturnType() && '\\' !== $type[0]) {
                 $this->writer->write('\\');
             }

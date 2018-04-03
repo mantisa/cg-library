@@ -31,6 +31,7 @@ class PhpMethod extends AbstractPhpMember
     private $abstract = false;
     private $parameters = array();
     private $referenceReturned = false;
+    private $nullableTypeReturned = false;
     private $returnType = null;
     private $returnTypeBuiltin = false;
     private $body = '';
@@ -58,6 +59,7 @@ class PhpMethod extends AbstractPhpMember
         if (method_exists($ref, 'getReturnType')) {
             if ($type = $ref->getReturnType()) {
                 $method->setReturnType((string)$type);
+                $method->setNullableTypeReturned($type->allowsNull());
             }
         }
 
@@ -107,6 +109,16 @@ class PhpMethod extends AbstractPhpMember
     public function setReferenceReturned($bool)
     {
         $this->referenceReturned = (Boolean) $bool;
+
+        return $this;
+    }
+
+    /**
+     * @param boolean $bool
+     */
+    public function setNullableTypeReturned($bool)
+    {
+        $this->nullableTypeReturned = (Boolean) $bool;
 
         return $this;
     }
@@ -205,6 +217,11 @@ class PhpMethod extends AbstractPhpMember
     public function isReferenceReturned()
     {
         return $this->referenceReturned;
+    }
+
+    public function isNullableTypeReturned()
+    {
+        return $this->nullableTypeReturned;
     }
 
     public function getBody()
